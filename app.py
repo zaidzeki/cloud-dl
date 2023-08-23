@@ -37,14 +37,14 @@ def download():
             filename = f'static/files/{name}.{i}'
             with open(filename, 'wb') as fout:
                 fout.write(chunk)
-            # from mega import Mega
-            # mega = Mega()
-            # m = mega.login(
-            #     os.environ.get('MEGA_USER', ''),
-            #     os.environ.get('MEGA_PASS', '')
-            # )
+            from mega import Mega
+            mega = Mega()
+            m = mega.login(
+                os.environ.get('MEGA_USER', ''),
+                os.environ.get('MEGA_PASS', '')
+            )
             # TODO use proper keywords
-            # m.upload(filename, f'{name}.{i}')
+            m.upload(filename, dest_filename=f'{name}.{i}')
     except Exception as e:
         return error(str(e))
     return success('')
