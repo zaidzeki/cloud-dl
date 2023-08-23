@@ -7,6 +7,14 @@ import requests
 from pytube import YouTube
 from flask import Flask, jsonify, render_template, request
 from humanfriendly import module as humanfriendly
+from mega import Mega
+
+mega = Mega()
+m = mega.login(
+    os.environ.get('MEGA_USER', ''),
+    os.environ.get('MEGA_PASS', '')
+)
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -37,14 +45,8 @@ def download():
             filename = f'static/files/{name}.{i}'
             with open(filename, 'wb') as fout:
                 fout.write(chunk)
-            from mega import Mega
-            mega = Mega()
-            m = mega.login(
-                os.environ.get('MEGA_USER', ''),
-                os.environ.get('MEGA_PASS', '')
-            )
             # TODO use proper keywords
-            m.upload(filename, dest_filename=f'{name}.{i}')
+            m.upload(filename, dest='.', dest_filename=f'{name}.{i}')
     except Exception as e:
         return error(str(e))
     return success('')
