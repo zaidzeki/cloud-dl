@@ -2,6 +2,7 @@
 
 import os
 from glob import glob
+from threading import Thread
 
 import requests
 from pytube import YouTube
@@ -35,21 +36,25 @@ def error(message):
 def index():
     return render_template('index.html')
 
+def start_download(url, name):
+    resp = requests.get(url, stream=True, allow_redirects=True)
+    for i, chunk in enumerate(resp.iter_content(100*1000*1000)):
+        filename = f'static/files/{name}.{i}'
+        with open(filename, 'wb') as fout:
+            fout.write(chunk)
+        # TODO use proper keywords
+        os.chdir('static/files')
+        m.upload(f'{name}.{i}')
+        os.remove(f'{name}.{i}')
+        os.chdir('../..')
+
+
 @app.route('/download', methods=['POST'])
 def download():
     url = request.form.get('url')
     name = request.form.get('name')
     try:
-        resp = requests.get(url, stream=True, allow_redirects=True)
-        for i, chunk in enumerate(resp.iter_content(100*1000*1000)):
-            filename = f'static/files/{name}.{i}'
-            with open(filename, 'wb') as fout:
-                fout.write(chunk)
-            # TODO use proper keywords
-            os.chdir('static/files')
-            m.upload(f'{name}.{i}')
-            os.remove(f'{name}.{i}')
-            os.chdir('../..')
+        Thread(target=start_download, args=(url, name)).start()
     except Exception as e:
         return error(str(e))
     return success('')
