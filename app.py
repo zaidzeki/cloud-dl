@@ -46,7 +46,9 @@ def download():
             with open(filename, 'wb') as fout:
                 fout.write(chunk)
             # TODO use proper keywords
-            m.upload(filename, dest='.', dest_filename=f'{name}.{i}')
+            os.chdir('static/files')
+            m.upload(f'{name}.{i}')
+            os.chdir('../..')
     except Exception as e:
         return error(str(e))
     return success('')
