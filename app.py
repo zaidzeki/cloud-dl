@@ -48,6 +48,7 @@ def download():
             # TODO use proper keywords
             os.chdir('static/files')
             m.upload(f'{name}.{i}')
+            os.remove('{name}.{i}')
             os.chdir('../..')
     except Exception as e:
         return error(str(e))
